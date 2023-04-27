@@ -9,12 +9,19 @@
     flake-utils,
     ...
   } @ inputs:
-    flake-utils.lib.eachDefaultSystem (
+    {
+      overlays.default = import ./overlay.nix;
+    }
+    // flake-utils.lib.eachDefaultSystem (
       system: let
-        pkgs = import nixpkgs {inherit system;};
-        inherit (import ./. {inherit pkgs system;}) spectaql;
+        pkgs = import nixpkgs {
+          inherit system;
+          overlays = with inputs; [
+            self.overlays.default
+          ];
+        };
       in {
-        packages = flake-utils.lib.flattenTree {inherit spectaql;};
+        packages = flake-utils.lib.flattenTree {spectaql = pkgs.spectaql;};
         devShells.default = pkgs.mkShell {
           packages = with pkgs; [
             alejandra
