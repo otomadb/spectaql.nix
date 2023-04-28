@@ -21,7 +21,10 @@
           ];
         };
       in {
-        packages = flake-utils.lib.flattenTree {spectaql = pkgs.spectaql;};
+        packages = flake-utils.lib.flattenTree rec {
+          default = pkgs.spectaql;
+          spectaql = default;
+        };
         devShells.default = pkgs.mkShell {
           packages = with pkgs; [
             alejandra
